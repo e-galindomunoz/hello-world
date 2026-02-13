@@ -23,6 +23,7 @@ export default function GoogleSignInButton() {
         borderRadius: "10px",
         border: "1px solid #dadce0",
         background: "#fff",
+        color: "#202124",
         cursor: "pointer",
         fontWeight: 500,
         fontSize: 15,
