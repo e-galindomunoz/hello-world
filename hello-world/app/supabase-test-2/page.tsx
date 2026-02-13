@@ -1,6 +1,10 @@
-import { supabase } from "@/lib/supabaseClient";
+export const dynamic = "force-dynamic";
+
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export default async function ExamplesPage() {
+  const supabase = await createSupabaseServerClient();
+
   const { data, error } = await supabase
     .from("terms")
     .select("example");
@@ -18,7 +22,6 @@ export default async function ExamplesPage() {
           <li key={i}>{row.example}</li>
         ))}
       </ul>
-
     </main>
   );
 }
