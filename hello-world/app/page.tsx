@@ -8,17 +8,39 @@ export default async function HomePage() {
   const user = data.user;
 
   // If already logged in, go straight to protected area
-  if (user) redirect("/protected");
+  if (user) redirect("/supabase-test-2");
 
   // Otherwise show the sign-in screen immediately
   return (
-    <main style={{ padding: 32, maxWidth: 560, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>Please sign in</h1>
-      <p style={{ marginTop: 0, marginBottom: 20 }}>
-        Please sign in with Google to continue.
-      </p>
+    <main
+      style={{
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0f0f10",
+      }}
+    >
+      <div
+        style={{
+          background: "#1c1c1f",
+          padding: "48px 40px",
+          borderRadius: "18px",
+          textAlign: "center",
+          width: "340px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+        }}
+      >
+        {/* New Title */}
+        <h1 style={{ marginBottom: 28, fontSize: 28 }}>
+          Welcome 👋
+        </h1>
 
-      <GoogleSignInButton />
+        {/* Centered Button */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <GoogleSignInButton />
+        </div>
+      </div>
     </main>
   );
 }

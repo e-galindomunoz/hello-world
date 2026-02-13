@@ -14,14 +14,68 @@ export default async function ExamplesPage() {
   }
 
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Examples</h1>
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#0f0f10",
+        display: "flex",
+        justifyContent: "center",
+        paddingTop: 60,
+      }}
+    >
+      <div
+        style={{
+          background: "#1c1c1f",
+          padding: 24,
+          borderRadius: 12,
+          width: 500,
+        }}
+      >
+        <h1 style={{ marginBottom: 16 }}>Examples</h1>
 
-      <ul>
-        {data?.map((row, i) => (
-          <li key={i}>{row.example}</li>
-        ))}
-      </ul>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+          }}
+        >
+          <thead>
+            <tr>
+              <th
+                style={{
+                  textAlign: "left",
+                  borderBottom: "1px solid #444",
+                  paddingBottom: 8,
+                }}
+              >
+                #
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  borderBottom: "1px solid #444",
+                  paddingBottom: 8,
+                }}
+              >
+                Example
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {data?.map((row, i) => (
+              <tr key={i}>
+                <td style={{ padding: "8px 0", opacity: 0.7 }}>
+                  {i + 1}
+                </td>
+                <td style={{ padding: "8px 0" }}>
+                  {row.example}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }
