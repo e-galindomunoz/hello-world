@@ -18,6 +18,7 @@ export default function VoteButtons({
   upvotes = 0,
   downvotes = 0,
 }: VoteButtonsProps) {
+  const jade = "#00A86B";
   const [isVoting, setIsVoting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -41,19 +42,14 @@ export default function VoteButtons({
     const isActive = userVote === value;
     const isHovered = hovered === value;
     
-    let backgroundColor = "#333";
-    if (value === 1) {
-      if (isActive) backgroundColor = "#4CAF50";
-      else if (isHovered) backgroundColor = "#66bb6a";
-    } else {
-      if (isActive) backgroundColor = "#f44336";
-      else if (isHovered) backgroundColor = "#ef5350";
-    }
+    let backgroundColor = "transparent";
+    if (isActive) backgroundColor = jade;
+    else if (isHovered) backgroundColor = "#00C97A";
 
     return {
       background: backgroundColor,
-      color: "white",
-      border: "none",
+      color: isActive || isHovered ? "#000" : jade,
+      border: `1px solid ${jade}`,
       padding: "10px 20px",
       borderRadius: "8px",
       cursor: isVoting ? "not-allowed" : "pointer",
@@ -94,7 +90,7 @@ export default function VoteButtons({
         </button>
       </div>
       {error && (
-        <div style={{ color: "#ff4d4d", fontSize: "12px", marginTop: "8px", textAlign: "center" }}>
+        <div style={{ color: jade, fontSize: "12px", marginTop: "8px", textAlign: "center" }}>
           {error}
         </div>
       )}

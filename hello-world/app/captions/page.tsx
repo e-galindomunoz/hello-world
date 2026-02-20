@@ -7,6 +7,7 @@ import VoteButtons from "./VoteButtons";
 import { redirect } from "next/navigation";
 
 export default async function CaptionsPage() {
+  const jade = "#00A86B";
   const supabase = await createSupabaseServerClient();
 
   // Get user session
@@ -18,6 +19,7 @@ export default async function CaptionsPage() {
   // Fetch current user's votes if logged in
   let userVotes: Record<string, number> = {};
 
+  let votedCount = 0;
   if (user) {
     const { data: votesData } = await supabase
       .from("caption_votes")
@@ -25,6 +27,7 @@ export default async function CaptionsPage() {
       .eq("profile_id", user.id);
     
     if (votesData) {
+      votedCount = votesData.length;
       userVotes = votesData.reduce((acc: any, vote: any) => {
         acc[vote.caption_id] = vote.vote_value;
         return acc;
@@ -45,6 +48,8 @@ export default async function CaptionsPage() {
     const randomIndex = Math.floor(Math.random() * availableIds.length);
     randomId = availableIds[randomIndex].id;
   }
+  const totalAvailable = availableIds?.length || 0;
+  const captionsLeft = Math.max(totalAvailable - votedCount, 0);
 
   // 3. Fetch the full data for that specific random ID AND its vote counts
   let captions: any[] = [];
@@ -79,10 +84,10 @@ export default async function CaptionsPage() {
 
   if (captionsError) {
     return (
-      <main style={{ padding: 24, color: "white", background: "#0f0f10", minHeight: "100vh" }}>
+      <main style={{ padding: 24, color: jade, background: "#000", minHeight: "100vh" }}>
         <h1>Error</h1>
         <p>{captionsError.message}</p>
-        <Link href="/" style={{ color: "#3b82f6" }}>Go Back</Link>
+        <Link href="/" style={{ color: jade }}>Go Back</Link>
       </main>
     );
   }
@@ -91,19 +96,20 @@ export default async function CaptionsPage() {
     <main
       style={{
         minHeight: "100vh",
-        background: "#0f0f10",
+        background: "#000",
         display: "flex",
         justifyContent: "center",
         paddingTop: 60,
-        color: "white",
+        color: jade,
       }}
     >
       <div
         style={{
-          background: "#1c1c1f",
+          background: "#000",
           padding: 24,
           borderRadius: 12,
           width: 600,
+          border: `1px solid ${jade}`,
         }}
       >
         <div
@@ -119,6 +125,9 @@ export default async function CaptionsPage() {
             <p style={{ margin: "4px 0 0 0", fontSize: "14px", opacity: 0.6 }}>
               Enjoy random captions!
             </p>
+            <p style={{ margin: "6px 0 0 0", fontSize: "14px", opacity: 0.9 }}>
+              Captions left: {captionsLeft}
+            </p>
           </div>
           {user ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -126,7 +135,7 @@ export default async function CaptionsPage() {
               <SignOutButton />
             </div>
           ) : (
-            <Link href="/" style={{ color: "#3b82f6", textDecoration: "none" }}>Sign In to Vote</Link>
+            <Link href="/" style={{ color: jade, textDecoration: "none" }}>Sign In to Vote</Link>
           )}
         </div>
 
@@ -140,9 +149,9 @@ export default async function CaptionsPage() {
                   key={caption.id}
                   style={{
                     padding: "16px",
-                    background: "#1c1c1f",
+                    background: "#000",
                     borderRadius: "12px",
-                    border: "1px solid #333",
+                    border: `1px solid ${jade}`,
                   }}
                 >
                   {caption.images?.url && (
@@ -159,7 +168,7 @@ export default async function CaptionsPage() {
                       }} 
                     />
                   )}
-                  <p style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "500", textAlign: "center" }}>
+                  <p style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "500", textAlign: "center", color: jade }}>
                     "{caption.content}"
                   </p>
                   
@@ -177,12 +186,7 @@ export default async function CaptionsPage() {
                 </div>
               );
             })
-          ) : (
-            <div style={{ textAlign: "center", padding: "40px 0" }}>
-              <p style={{ fontSize: "20px", marginBottom: "8px" }}>🎉 All caught up!</p>
-              <p style={{ opacity: 0.5 }}>You've voted on all available captions.</p>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
     </main>

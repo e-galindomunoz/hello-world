@@ -88,6 +88,6 @@ export default async function ExamplesPage() {
           </tbody>
         </table>
       </div>
-    </main>
+   </main>
   );
 }
