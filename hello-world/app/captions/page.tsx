@@ -35,11 +35,10 @@ export default async function CaptionsPage() {
     }
   }
 
-  // 1. Fetch all caption IDs that have images
+  // 1. Fetch all caption IDs (no restrictions)
   const { data: allIds, error: allIdsError } = await supabase
     .from("captions")
-    .select("id")
-    .not("images", "is", null);
+    .select("id");
 
   if (allIdsError) {
     return (
