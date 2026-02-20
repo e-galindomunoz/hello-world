@@ -35,11 +35,12 @@ export default async function CaptionsPage() {
     }
   }
 
-  // 1. Fetch IDs the user has NOT voted on yet
+  // 1. Fetch IDs the user has NOT voted on yet, only where an image exists
   const votedIds = Object.keys(userVotes);
   let availableIdsQuery = supabase
     .from("captions")
     .select("id")
+    .not("images", "is", null)
     .neq("content", "")
     .not("content", "is", null);
 
@@ -67,7 +68,7 @@ export default async function CaptionsPage() {
     // Fetch caption details
     const { data, error } = await supabase
       .from("captions")
-      .select("id, content, like_count, images(url)")
+      .select("id, content, like_count, images!inner(url)")
       .eq("id", randomId)
       .limit(1);
     
@@ -128,12 +129,6 @@ export default async function CaptionsPage() {
         >
           <div>
             <h1 style={{ margin: 0 }}>Rate Captions</h1>
-            <p style={{ margin: "4px 0 0 0", fontSize: "14px", opacity: 0.6 }}>
-              Enjoy random captions!
-            </p>
-            <p style={{ margin: "6px 0 0 0", fontSize: "14px", opacity: 0.9 }}>
-              Captions left: {captionsLeft}
-            </p>
           </div>
           {user ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
