@@ -15,16 +15,10 @@ export default async function CaptionsPage() {
 
   if (!user) redirect("/");
 
-  // Fetch captions with images (only those that have a matching image)
-  const { data: captions, error: captionsError } = await supabase
-    .from("captions")
-    .select("id, content, like_count, images!inner(url)")
-    .neq("content", "")
-    .not("content", "is", null)
-    .order("created_datetime_utc", { ascending: false });
-
   // Fetch current user's votes if logged in
   let userVotes: Record<string, number> = {};
+  let totalVotesCount = 0;
+
   if (user) {
     const { data: votesData } = await supabase
       .from("caption_votes")
@@ -32,12 +26,31 @@ export default async function CaptionsPage() {
       .eq("profile_id", user.id);
     
     if (votesData) {
+      totalVotesCount = votesData.length;
       userVotes = votesData.reduce((acc: any, vote: any) => {
         acc[vote.caption_id] = vote.vote_value;
         return acc;
       }, {});
     }
   }
+
+  // Get IDs of captions already voted on
+  const votedCaptionIds = Object.keys(userVotes);
+
+  // Fetch ONE caption that the user HAS NOT voted on yet
+  let query = supabase
+    .from("captions")
+    .select("id, content, like_count, images!inner(url)")
+    .neq("content", "")
+    .not("content", "is", null);
+
+  if (votedCaptionIds.length > 0) {
+    query = query.not("id", "in", `(${votedCaptionIds.join(",")})`);
+  }
+
+  const { data: captions, error: captionsError } = await query
+    .order("created_datetime_utc", { ascending: false })
+    .limit(1);
 
   if (captionsError) {
     return (
@@ -76,7 +89,12 @@ export default async function CaptionsPage() {
             marginBottom: 24,
           }}
         >
-          <h1 style={{ margin: 0 }}>Captions</h1>
+          <div>
+            <h1 style={{ margin: 0 }}>Rate Captions</h1>
+            <p style={{ margin: "4px 0 0 0", fontSize: "14px", opacity: 0.6 }}>
+              Total Voted: {totalVotesCount}
+            </p>
+          </div>
           {user ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <span style={{ fontSize: "14px", opacity: 0.7 }}>{user.email}</span>
@@ -134,7 +152,10 @@ export default async function CaptionsPage() {
               );
             })
           ) : (
-            <p style={{ opacity: 0.5 }}>No captions found. Add some to the database!</p>
+            <div style={{ textAlign: "center", padding: "40px 0" }}>
+              <p style={{ fontSize: "20px", marginBottom: "8px" }}>🎉 All caught up!</p>
+              <p style={{ opacity: 0.5 }}>You've voted on all available captions.</p>
+            </div>
           )}
         </div>
       </div>
