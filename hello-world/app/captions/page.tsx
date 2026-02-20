@@ -37,20 +37,40 @@ export default async function CaptionsPage() {
   // Get IDs of captions already voted on
   const votedCaptionIds = Object.keys(userVotes);
 
-  // Fetch ONE caption that the user HAS NOT voted on yet
-  let query = supabase
+  // 1. Fetch ALL available IDs that the user hasn't voted on
+  let idQuery = supabase
     .from("captions")
-    .select("id, content, like_count, images!inner(url)")
+    .select("id")
     .neq("content", "")
     .not("content", "is", null);
 
   if (votedCaptionIds.length > 0) {
-    query = query.not("id", "in", `(${votedCaptionIds.join(",")})`);
+    idQuery = idQuery.not("id", "in", `(${votedCaptionIds.join(",")})`);
   }
 
-  const { data: captions, error: captionsError } = await query
-    .order("created_datetime_utc", { ascending: false })
-    .limit(1);
+  const { data: availableIds } = await idQuery;
+
+  // 2. Pick a random ID from the list
+  let randomId = null;
+  if (availableIds && availableIds.length > 0) {
+    const randomIndex = Math.floor(Math.random() * availableIds.length);
+    randomId = availableIds[randomIndex].id;
+  }
+
+  // 3. Fetch the full data for that specific random ID
+  let captions: any[] = [];
+  let captionsError = null;
+
+  if (randomId) {
+    const { data, error } = await supabase
+      .from("captions")
+      .select("id, content, like_count, images!inner(url)")
+      .eq("id", randomId)
+      .limit(1);
+    
+    captions = data || [];
+    captionsError = error;
+  }
 
   if (captionsError) {
     return (

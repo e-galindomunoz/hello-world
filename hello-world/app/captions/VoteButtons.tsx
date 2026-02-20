@@ -16,6 +16,7 @@ export default function VoteButtons({
 }: VoteButtonsProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   const handleVote = async (value: number) => {
     setIsVoting(true);
@@ -32,36 +33,52 @@ export default function VoteButtons({
     }
   };
 
+  const getButtonStyle = (value: number) => {
+    const isActive = userVote === value;
+    const isHovered = hovered === value;
+    
+    let backgroundColor = "#333";
+    if (value === 1) {
+      if (isActive) backgroundColor = "#4CAF50";
+      else if (isHovered) backgroundColor = "#66bb6a";
+    } else {
+      if (isActive) backgroundColor = "#f44336";
+      else if (isHovered) backgroundColor = "#ef5350";
+    }
+
+    return {
+      background: backgroundColor,
+      color: "white",
+      border: "none",
+      padding: "8px 16px",
+      borderRadius: "6px",
+      cursor: isVoting ? "not-allowed" : "pointer",
+      opacity: isVoting ? 0.7 : 1,
+      transition: "background-color 0.2s ease",
+      fontWeight: "bold" as const,
+    };
+  };
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
       <button
         onClick={() => handleVote(1)}
+        onMouseEnter={() => setHovered(1)}
+        onMouseLeave={() => setHovered(null)}
         disabled={isVoting}
-        style={{
-          background: userVote === 1 ? "#4CAF50" : "#333",
-          color: "white",
-          border: "none",
-          padding: "4px 12px",
-          borderRadius: "4px",
-          cursor: isVoting ? "not-allowed" : "pointer",
-          opacity: isVoting ? 0.7 : 1,
-        }}
+        style={getButtonStyle(1)}
       >
         ▲ Upvote
       </button>
-      <span style={{ fontWeight: "bold" }}>{initialLikeCount}</span>
+      <span style={{ fontWeight: "bold", minWidth: "20px", textAlign: "center" }}>
+        {initialLikeCount}
+      </span>
       <button
         onClick={() => handleVote(-1)}
+        onMouseEnter={() => setHovered(-1)}
+        onMouseLeave={() => setHovered(null)}
         disabled={isVoting}
-        style={{
-          background: userVote === -1 ? "#f44336" : "#333",
-          color: "white",
-          border: "none",
-          padding: "4px 12px",
-          borderRadius: "4px",
-          cursor: isVoting ? "not-allowed" : "pointer",
-          opacity: isVoting ? 0.7 : 1,
-        }}
+        style={getButtonStyle(-1)}
       >
         ▼ Downvote
       </button>
