@@ -7,8 +7,8 @@ export default async function HomePage() {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
 
-  // If already logged in, go straight to protected area
-  if (user) redirect("/supabase-test-2");
+  // If already logged in, go straight to captions
+  if (user) redirect("/captions");
 
   // Otherwise show the sign-in screen immediately
   return (
@@ -37,8 +37,11 @@ export default async function HomePage() {
         </h1>
 
         {/* Centered Button */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
           <GoogleSignInButton />
+          <a href="/captions" style={{ color: "#3b82f6", textDecoration: "none", fontSize: "14px" }}>
+            View Captions without signing in
+          </a>
         </div>
       </div>
     </main>

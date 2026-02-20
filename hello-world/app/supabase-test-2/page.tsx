@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import SignOutButton from "../SignOutButton";
+import Link from "next/link";
 
 export default async function ExamplesPage() {
   const supabase = await createSupabaseServerClient();
@@ -47,7 +48,10 @@ export default async function ExamplesPage() {
           }}
         >
           <h1 style={{ margin: 0 }}>Examples</h1>
-          <SignOutButton />
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <Link href="/captions" style={{ color: "#3b82f6" }}>Captions</Link>
+            <SignOutButton />
+          </div>
         </div>
 
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
