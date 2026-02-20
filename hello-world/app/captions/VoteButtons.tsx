@@ -7,12 +7,16 @@ interface VoteButtonsProps {
   captionId: string;
   initialLikeCount: number;
   userVote?: number;
+  upvotes?: number;
+  downvotes?: number;
 }
 
 export default function VoteButtons({
   captionId,
   initialLikeCount,
   userVote,
+  upvotes = 0,
+  downvotes = 0,
 }: VoteButtonsProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,39 +54,50 @@ export default function VoteButtons({
       background: backgroundColor,
       color: "white",
       border: "none",
-      padding: "8px 16px",
-      borderRadius: "6px",
+      padding: "10px 20px",
+      borderRadius: "8px",
       cursor: isVoting ? "not-allowed" : "pointer",
       opacity: isVoting ? 0.7 : 1,
-      transition: "background-color 0.2s ease",
+      transition: "all 0.2s ease",
       fontWeight: "bold" as const,
+      flex: 1,
+      display: "flex",
+      flexDirection: "column" as const,
+      alignItems: "center",
+      gap: "4px"
     };
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <button
-        onClick={() => handleVote(1)}
-        onMouseEnter={() => setHovered(1)}
-        onMouseLeave={() => setHovered(null)}
-        disabled={isVoting}
-        style={getButtonStyle(1)}
-      >
-        ▲ Upvote
-      </button>
-      <span style={{ fontWeight: "bold", minWidth: "20px", textAlign: "center" }}>
-        {initialLikeCount}
-      </span>
-      <button
-        onClick={() => handleVote(-1)}
-        onMouseEnter={() => setHovered(-1)}
-        onMouseLeave={() => setHovered(null)}
-        disabled={isVoting}
-        style={getButtonStyle(-1)}
-      >
-        ▼ Downvote
-      </button>
-      {error && <span style={{ color: "#ff4d4d", fontSize: "12px" }}>{error}</span>}
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", justifyContent: "center" }}>
+        <button
+          onClick={() => handleVote(1)}
+          onMouseEnter={() => setHovered(1)}
+          onMouseLeave={() => setHovered(null)}
+          disabled={isVoting}
+          style={getButtonStyle(1)}
+        >
+          <span style={{ fontSize: "18px" }}>▲</span>
+          <span style={{ fontSize: "14px" }}>{upvotes}</span>
+        </button>
+
+        <button
+          onClick={() => handleVote(-1)}
+          onMouseEnter={() => setHovered(-1)}
+          onMouseLeave={() => setHovered(null)}
+          disabled={isVoting}
+          style={getButtonStyle(-1)}
+        >
+          <span style={{ fontSize: "18px" }}>▼</span>
+          <span style={{ fontSize: "14px" }}>{downvotes}</span>
+        </button>
+      </div>
+      {error && (
+        <div style={{ color: "#ff4d4d", fontSize: "12px", marginTop: "8px", textAlign: "center" }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }

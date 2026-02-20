@@ -17,7 +17,6 @@ export default async function CaptionsPage() {
 
   // Fetch current user's votes if logged in
   let userVotes: Record<string, number> = {};
-  let totalVotesCount = 0;
 
   if (user) {
     const { data: votesData } = await supabase
@@ -26,7 +25,6 @@ export default async function CaptionsPage() {
       .eq("profile_id", user.id);
     
     if (votesData) {
-      totalVotesCount = votesData.length;
       userVotes = votesData.reduce((acc: any, vote: any) => {
         acc[vote.caption_id] = vote.vote_value;
         return acc;
@@ -34,21 +32,12 @@ export default async function CaptionsPage() {
     }
   }
 
-  // Get IDs of captions already voted on
-  const votedCaptionIds = Object.keys(userVotes);
-
-  // 1. Fetch ALL available IDs that the user hasn't voted on
-  let idQuery = supabase
+  // 1. Fetch ALL available IDs (even if already voted on, to keep it continuous)
+  const { data: availableIds } = await supabase
     .from("captions")
     .select("id")
     .neq("content", "")
     .not("content", "is", null);
-
-  if (votedCaptionIds.length > 0) {
-    idQuery = idQuery.not("id", "in", `(${votedCaptionIds.join(",")})`);
-  }
-
-  const { data: availableIds } = await idQuery;
 
   // 2. Pick a random ID from the list
   let randomId = null;
@@ -57,11 +46,14 @@ export default async function CaptionsPage() {
     randomId = availableIds[randomIndex].id;
   }
 
-  // 3. Fetch the full data for that specific random ID
+  // 3. Fetch the full data for that specific random ID AND its vote counts
   let captions: any[] = [];
   let captionsError = null;
+  let upvoteCount = 0;
+  let downvoteCount = 0;
 
   if (randomId) {
+    // Fetch caption details
     const { data, error } = await supabase
       .from("captions")
       .select("id, content, like_count, images!inner(url)")
@@ -70,6 +62,19 @@ export default async function CaptionsPage() {
     
     captions = data || [];
     captionsError = error;
+
+    if (captions.length > 0) {
+      // Fetch upvote and downvote totals for this caption
+      const { data: votesForCaption } = await supabase
+        .from("caption_votes")
+        .select("vote_value")
+        .eq("caption_id", randomId);
+
+      if (votesForCaption) {
+        upvoteCount = votesForCaption.filter((v: any) => v.vote_value === 1).length;
+        downvoteCount = votesForCaption.filter((v: any) => v.vote_value === -1).length;
+      }
+    }
   }
 
   if (captionsError) {
@@ -112,7 +117,7 @@ export default async function CaptionsPage() {
           <div>
             <h1 style={{ margin: 0 }}>Rate Captions</h1>
             <p style={{ margin: "4px 0 0 0", fontSize: "14px", opacity: 0.6 }}>
-              Total Voted: {totalVotesCount}
+              Enjoy random captions!
             </p>
           </div>
           {user ? (
@@ -135,8 +140,8 @@ export default async function CaptionsPage() {
                   key={caption.id}
                   style={{
                     padding: "16px",
-                    background: "#2a2a2e",
-                    borderRadius: "8px",
+                    background: "#1c1c1f",
+                    borderRadius: "12px",
                     border: "1px solid #333",
                   }}
                 >
@@ -146,26 +151,27 @@ export default async function CaptionsPage() {
                       alt="Caption Image" 
                       style={{ 
                         width: "100%", 
-                        borderRadius: "4px", 
-                        marginBottom: "12px",
-                        display: "block"
+                        borderRadius: "8px", 
+                        marginBottom: "16px",
+                        display: "block",
+                        aspectRatio: "1/1",
+                        objectFit: "cover"
                       }} 
                     />
                   )}
-                  <p style={{ margin: "0 0 12px 0", fontSize: "18px" }}>
-                    {caption.content}
+                  <p style={{ margin: "0 0 16px 0", fontSize: "20px", fontWeight: "500", textAlign: "center" }}>
+                    "{caption.content}"
                   </p>
                   
-                  {user ? (
-                    <VoteButtons
-                      captionId={caption.id}
-                      initialLikeCount={caption.like_count || 0}
-                      userVote={userVoteValue}
-                    />
-                  ) : (
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", opacity: 0.6 }}>
-                      <span style={{ fontWeight: "bold" }}>{caption.like_count || 0}</span>
-                      <span style={{ fontSize: "14px" }}>likes</span>
+                  {user && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      <VoteButtons
+                        captionId={caption.id}
+                        initialLikeCount={caption.like_count || 0}
+                        userVote={userVoteValue}
+                        upvotes={upvoteCount}
+                        downvotes={downvoteCount}
+                      />
                     </div>
                   )}
                 </div>
