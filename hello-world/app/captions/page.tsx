@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import SignOutButton from "../SignOutButton";
 import Link from "next/link";
 import VoteButtons from "./VoteButtons";
+import { redirect } from "next/navigation";
 
 export default async function CaptionsPage() {
   const supabase = await createSupabaseServerClient();
@@ -12,10 +13,14 @@ export default async function CaptionsPage() {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
 
-  // Fetch captions
+  if (!user) redirect("/");
+
+  // Fetch captions with images (only those that have a matching image)
   const { data: captions, error: captionsError } = await supabase
     .from("captions")
-    .select("id, content, like_count")
+    .select("id, content, like_count, images!inner(url)")
+    .neq("content", "")
+    .not("content", "is", null)
     .order("created_datetime_utc", { ascending: false });
 
   // Fetch current user's votes if logged in
@@ -97,6 +102,18 @@ export default async function CaptionsPage() {
                     border: "1px solid #333",
                   }}
                 >
+                  {caption.images?.url && (
+                    <img 
+                      src={caption.images.url} 
+                      alt="Caption Image" 
+                      style={{ 
+                        width: "100%", 
+                        borderRadius: "4px", 
+                        marginBottom: "12px",
+                        display: "block"
+                      }} 
+                    />
+                  )}
                   <p style={{ margin: "0 0 12px 0", fontSize: "18px" }}>
                     {caption.content}
                   </p>
