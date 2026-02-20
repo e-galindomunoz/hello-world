@@ -7,7 +7,7 @@ import VoteButtons from "./VoteButtons";
 import { redirect } from "next/navigation";
 
 export default async function CaptionsPage() {
-  const jade = "#00A86B";
+  const jade = "#00D48A";
   const supabase = await createSupabaseServerClient();
 
   // Get user session
@@ -35,12 +35,19 @@ export default async function CaptionsPage() {
     }
   }
 
-  // 1. Fetch ALL available IDs (even if already voted on, to keep it continuous)
-  const { data: availableIds } = await supabase
+  // 1. Fetch IDs the user has NOT voted on yet
+  const votedIds = Object.keys(userVotes);
+  let availableIdsQuery = supabase
     .from("captions")
     .select("id")
     .neq("content", "")
     .not("content", "is", null);
+
+  if (votedIds.length > 0) {
+    availableIdsQuery = availableIdsQuery.not("id", "in", `(${votedIds.join(",")})`);
+  }
+
+  const { data: availableIds } = await availableIdsQuery;
 
   // 2. Pick a random ID from the list
   let randomId = null;
@@ -48,8 +55,7 @@ export default async function CaptionsPage() {
     const randomIndex = Math.floor(Math.random() * availableIds.length);
     randomId = availableIds[randomIndex].id;
   }
-  const totalAvailable = availableIds?.length || 0;
-  const captionsLeft = Math.max(totalAvailable - votedCount, 0);
+  const captionsLeft = availableIds?.length || 0;
 
   // 3. Fetch the full data for that specific random ID AND its vote counts
   let captions: any[] = [];
@@ -61,7 +67,7 @@ export default async function CaptionsPage() {
     // Fetch caption details
     const { data, error } = await supabase
       .from("captions")
-      .select("id, content, like_count, images!inner(url)")
+      .select("id, content, like_count, images(url)")
       .eq("id", randomId)
       .limit(1);
     
@@ -186,7 +192,14 @@ export default async function CaptionsPage() {
                 </div>
               );
             })
-          ) : null}
+          ) : (
+            <div style={{ textAlign: "center", padding: "40px 0" }}>
+              <p style={{ fontSize: "20px", marginBottom: "8px", color: jade }}>
+                You're all done for now!
+              </p>
+              <p style={{ opacity: 0.7 }}>Check back later for more captions.</p>
+            </div>
+          )}
         </div>
       </div>
     </main>

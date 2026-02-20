@@ -18,7 +18,7 @@ export default function VoteButtons({
   upvotes = 0,
   downvotes = 0,
 }: VoteButtonsProps) {
-  const jade = "#00A86B";
+  const jade = "#00D48A";
   const [isVoting, setIsVoting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -44,7 +44,7 @@ export default function VoteButtons({
     
     let backgroundColor = "transparent";
     if (isActive) backgroundColor = jade;
-    else if (isHovered) backgroundColor = "#00C97A";
+    else if (isHovered) backgroundColor = "#19E09C";
 
     return {
       background: backgroundColor,
