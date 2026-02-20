@@ -35,40 +35,38 @@ export default async function CaptionsPage() {
     }
   }
 
-  // 1. Fetch IDs the user has NOT voted on yet, only where an image exists
-  const votedIds = Object.keys(userVotes);
-  let availableIdsQuery = supabase
+  // 1. Fetch all caption IDs (no restrictions)
+  const { data: allIds, error: allIdsError } = await supabase
     .from("captions")
-    .select("id")
-    .not("images", "is", null)
-    .neq("content", "")
-    .not("content", "is", null);
+    .select("id");
 
-  if (votedIds.length > 0) {
-    availableIdsQuery = availableIdsQuery.not("id", "in", `(${votedIds.join(",")})`);
+  if (allIdsError) {
+    return (
+      <main style={{ padding: 24, color: jade, background: "#000", minHeight: "100vh" }}>
+        <h1>Error</h1>
+        <p>{allIdsError.message}</p>
+        <Link href="/" style={{ color: jade }}>Go Back</Link>
+      </main>
+    );
   }
-
-  const { data: availableIds } = await availableIdsQuery;
 
   // 2. Pick a random ID from the list
   let randomId = null;
-  if (availableIds && availableIds.length > 0) {
-    const randomIndex = Math.floor(Math.random() * availableIds.length);
-    randomId = availableIds[randomIndex].id;
+  if (allIds && allIds.length > 0) {
+    const randomIndex = Math.floor(Math.random() * allIds.length);
+    randomId = allIds[randomIndex].id;
   }
-  const captionsLeft = availableIds?.length || 0;
 
-  // 3. Fetch the full data for that specific random ID AND its vote counts
+  // 3. Fetch caption AND its vote counts
   let captions: any[] = [];
   let captionsError = null;
-  let upvoteCount = 0;
-  let downvoteCount = 0;
+  const voteCounts: Record<string, { up: number; down: number }> = {};
 
   if (randomId) {
     // Fetch caption details
     const { data, error } = await supabase
       .from("captions")
-      .select("id, content, like_count, images!inner(url)")
+      .select("id, content, like_count, images(url)")
       .eq("id", randomId)
       .limit(1);
     
@@ -77,14 +75,20 @@ export default async function CaptionsPage() {
 
     if (captions.length > 0) {
       // Fetch upvote and downvote totals for this caption
-      const { data: votesForCaption } = await supabase
+      const { data: votesForCaptions } = await supabase
         .from("caption_votes")
-        .select("vote_value")
+        .select("caption_id, vote_value")
         .eq("caption_id", randomId);
 
-      if (votesForCaption) {
-        upvoteCount = votesForCaption.filter((v: any) => v.vote_value === 1).length;
-        downvoteCount = votesForCaption.filter((v: any) => v.vote_value === -1).length;
+      if (votesForCaptions) {
+        for (const vote of votesForCaptions) {
+          const captionId = vote.caption_id as string;
+          if (!voteCounts[captionId]) {
+            voteCounts[captionId] = { up: 0, down: 0 };
+          }
+          if (vote.vote_value === 1) voteCounts[captionId].up += 1;
+          if (vote.vote_value === -1) voteCounts[captionId].down += 1;
+        }
       }
     }
   }
@@ -144,6 +148,7 @@ export default async function CaptionsPage() {
           {captions && captions.length > 0 ? (
             captions.map((caption: any) => {
               const userVoteValue = userVotes[caption.id];
+              const counts = voteCounts[caption.id] || { up: 0, down: 0 };
 
               return (
                 <div
@@ -179,8 +184,8 @@ export default async function CaptionsPage() {
                         captionId={caption.id}
                         initialLikeCount={caption.like_count || 0}
                         userVote={userVoteValue}
-                        upvotes={upvoteCount}
-                        downvotes={downvoteCount}
+                        upvotes={counts.up}
+                        downvotes={counts.down}
                       />
                     </div>
                   )}
@@ -190,7 +195,7 @@ export default async function CaptionsPage() {
           ) : (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               <p style={{ fontSize: "20px", marginBottom: "8px", color: jade }}>
-                You're all done for now!
+                No captions are available right now.
               </p>
               <p style={{ opacity: 0.7 }}>Check back later for more captions.</p>
             </div>
