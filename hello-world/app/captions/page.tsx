@@ -1,12 +1,15 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+
+export const metadata: Metadata = { title: "Rate Captions" };
 import SignOutButton from "../SignOutButton";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import UploadCaptioner from "./UploadCaptioner";
 import CaptionFeed from "./CaptionFeed";
 import { getRandomCaptions } from "./actions";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default async function CaptionsPage() {
   const jade = "#00D48A";
@@ -20,6 +23,8 @@ export default async function CaptionsPage() {
   const initialCaptions = await getRandomCaptions(10);
 
   return (
+    <>
+    <HamburgerMenu />
     <main
       style={{
         minHeight: "100vh",
@@ -72,15 +77,14 @@ export default async function CaptionsPage() {
           </div>
           {user ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span
-                style={{
-                  fontSize: "13px",
-                  opacity: 0.5,
-                  letterSpacing: "0.01em",
-                }}
-              >
-                {user.email}
-              </span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", opacity: 0.35, color: jade }}>
+                  Signed in as
+                </span>
+                <span style={{ fontSize: "13px", opacity: 0.5, letterSpacing: "0.01em" }}>
+                  {user.email}
+                </span>
+              </div>
               <SignOutButton />
             </div>
           ) : (
@@ -90,11 +94,9 @@ export default async function CaptionsPage() {
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <UploadCaptioner />
-          <CaptionFeed initialCaptions={initialCaptions} jade={jade} user={user} />
-        </div>
+        <CaptionFeed initialCaptions={initialCaptions} jade={jade} user={user} />
       </div>
     </main>
+    </>
   );
 }

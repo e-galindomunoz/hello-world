@@ -6,9 +6,9 @@ export async function submitVote(captionId: string, voteValue: number) {
   try {
     const supabase = await createSupabaseServerActionClient();
 
-    // 1. Check authentication (session read from cookie, no network call)
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // 1. Check authentication (verified against Supabase Auth server)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return { error: "You must be logged in to vote." };
     }
 
@@ -18,7 +18,7 @@ export async function submitVote(captionId: string, voteValue: number) {
       .upsert(
         {
           caption_id: captionId,
-          profile_id: session.user.id,
+          profile_id: user.id,
           vote_value: voteValue,
           created_datetime_utc: new Date().toISOString(),
         },
@@ -43,13 +43,18 @@ export async function getRandomCaptions(limit: number = 5) {
   try {
     const supabase = await createSupabaseServerActionClient();
 
-    // Session from cookie — no network call
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id ?? null;
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? null;
 
-    // 1. Parallelize: fetch caption ID pool + user's already-voted IDs
+    // 1. Parallelize: fetch caption ID pool (non-null, non-empty content, must have image)
+    //    + user's already-voted IDs
     const [idRes, votedRes] = await Promise.all([
-      supabase.from("captions").select("id").limit(200),
+      supabase
+        .from("captions")
+        .select("id, images!inner(id)")
+        .not("content", "is", null)
+        .neq("content", "")
+        .limit(200),
       userId
         ? supabase.from("caption_votes").select("caption_id").eq("profile_id", userId)
         : Promise.resolve({ data: [] }),
@@ -100,11 +105,49 @@ export async function getRandomCaptions(limit: number = 5) {
       };
     });
 
-    const withImages = processed.filter(cap => cap.images?.url);
+    const withImages = processed.filter(cap => cap.images?.url && cap.content?.trim());
     console.log(`[getRandomCaptions] Finished in ${Date.now() - start}ms`);
     return withImages;
   } catch (err) {
     console.error("Critical error in getRandomCaptions:", err);
     return [];
+  }
+}
+
+const GALLERY_PAGE_SIZE = 50;
+
+export async function getGalleryCaptions(
+  sortOrder: "newest" | "oldest" = "newest",
+  page: number = 1
+) {
+  const start = Date.now();
+  try {
+    const supabase = await createSupabaseServerActionClient();
+
+    const from = (page - 1) * GALLERY_PAGE_SIZE;
+    const to = from + GALLERY_PAGE_SIZE - 1;
+
+    const { data: captions, count, error } = await supabase
+      .from("captions")
+      .select("id, content, created_datetime_utc, images!inner(url)", { count: "exact" })
+      .order("created_datetime_utc", { ascending: sortOrder === "oldest" })
+      .range(from, to);
+
+    console.log(`[getGalleryCaptions] done: ${Date.now() - start}ms, rows: ${captions?.length ?? 0}, total: ${count}`);
+
+    if (error || !captions) {
+      console.error("Error fetching gallery captions:", error);
+      return { captions: [], totalCount: 0 };
+    }
+
+    const result = captions.map(cap => ({
+      ...cap,
+      images: Array.isArray(cap.images) ? cap.images[0] : cap.images,
+    }));
+
+    return { captions: result, totalCount: count ?? 0 };
+  } catch (err) {
+    console.error("Critical error in getGalleryCaptions:", err);
+    return { captions: [], totalCount: 0 };
   }
 }
