@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import VoteButtons from "./VoteButtons";
 import { getRandomCaptions } from "./actions";
 import { User } from "@supabase/supabase-js";
+import ActivityCheck from "./ActivityCheck";
 
 interface Caption {
   id: string;
@@ -74,6 +75,8 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
   }
 
   return (
+    <>
+    <ActivityCheck activityKey={currentIndex} />
     <div
       style={{
         padding: "20px",
@@ -158,5 +161,6 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
         <link rel="preload" as="image" href={queue[currentIndex + 1].images!.url} />
       )}
     </div>
+    </>
   );
 }

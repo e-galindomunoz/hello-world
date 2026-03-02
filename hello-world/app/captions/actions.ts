@@ -130,6 +130,8 @@ export async function getGalleryCaptions(
     const { data: captions, count, error } = await supabase
       .from("captions")
       .select("id, content, created_datetime_utc, images!inner(url)", { count: "exact" })
+      .not("content", "is", null)
+      .neq("content", "")
       .order("created_datetime_utc", { ascending: sortOrder === "oldest" })
       .range(from, to);
 
