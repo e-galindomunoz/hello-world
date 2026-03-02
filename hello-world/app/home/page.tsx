@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import SignOutButton from "@/app/SignOutButton";
 
 export const metadata: Metadata = { title: "Welcome" };
 
@@ -96,6 +97,11 @@ export default async function HomePage() {
           transform: translateX(4px) !important;
         }
       `}</style>
+
+      {/* Sign out */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 1000 }}>
+        <SignOutButton />
+      </div>
 
       {/* Ambient orbs */}
       <div style={{

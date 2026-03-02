@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Almost Crackd" };
+export const metadata: Metadata = { title: "LetsBeGoofy" };
 
 const jade = "#00D48A";
 
