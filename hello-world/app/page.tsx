@@ -16,17 +16,10 @@ const actions = [
     authRequired: false,
   },
   {
-    href: "/generate",
-    icon: "✦",
-    label: "Generate a Caption",
-    description: "Upload an image and let the AI do its thing",
-    authRequired: false,
-  },
-  {
     href: "/sign-in",
     icon: "🔓",
     label: "There's more...",
-    description: "Vote on captions, unlock the full experience — sign in to get access",
+    description: "Generate captions, vote on the funniest ones, and more — sign in to unlock it all",
     authRequired: true,
   },
 ];
