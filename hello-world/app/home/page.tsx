@@ -1,9 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import Link from "next/link";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
-export const metadata: Metadata = { title: "Almost Crackd" };
+export const metadata: Metadata = { title: "Welcome" };
 
 const jade = "#00D48A";
 
@@ -13,28 +15,32 @@ const actions = [
     icon: "◈",
     label: "View Gallery",
     description: "Browse every caption that's been submitted",
-    authRequired: false,
   },
   {
     href: "/generate",
     icon: "✦",
     label: "Generate a Caption",
     description: "Upload an image and let the AI do its thing",
-    authRequired: false,
   },
   {
-    href: "/sign-in",
-    icon: "🔓",
-    label: "There's more...",
-    description: "Vote on captions, unlock the full experience — sign in to get access",
-    authRequired: true,
+    href: "/captions",
+    icon: "⚡",
+    label: "Vote on Captions",
+    description: "Rate the funniest captions in the feed",
   },
 ];
 
-export default async function RootPage() {
+export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getUser();
-  if (data.user) redirect("/home");
+  if (!data.user) redirect("/sign-in");
+
+  const fullName =
+    data.user.user_metadata?.full_name ||
+    data.user.user_metadata?.name ||
+    data.user.email?.split("@")[0] ||
+    "there";
+  const name = fullName.split(" ")[0];
 
   return (
     <main
@@ -114,15 +120,25 @@ export default async function RootPage() {
         animation: "fadeUp 0.55s ease forwards",
       }}>
         <h1 style={{
-          margin: 0,
-          fontSize: "clamp(32px, 5vw, 48px)",
+          margin: "0 0 12px 0",
+          fontSize: "clamp(36px, 6vw, 52px)",
           fontWeight: 900,
           letterSpacing: "-0.03em",
           color: jade,
           animation: "titleGlow 3s ease-in-out infinite",
         }}>
-          What do you want to do today?
+          Welcome back, {name}!
         </h1>
+        <p style={{
+          margin: 0,
+          fontSize: 16,
+          color: jade,
+          opacity: 0.4,
+          fontWeight: 500,
+          letterSpacing: "0.01em",
+        }}>
+          What do you want to do today?
+        </p>
       </div>
 
       {/* Cards */}
@@ -139,78 +155,78 @@ export default async function RootPage() {
             key={action.href}
             style={{ animation: `fadeUp 0.55s ease ${0.1 + i * 0.12}s both`, flex: "1 1 220px", maxWidth: 260, display: "flex" }}
           >
-            <Link
-              href={action.href}
-              className="action-card"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                flex: 1,
-                padding: "28px 24px 22px",
-                borderRadius: 20,
-                border: "1px solid rgba(0,212,138,0.2)",
-                background: "linear-gradient(160deg, #080f0c 0%, #040806 60%, #020504 100%)",
-                textDecoration: "none",
-                color: jade,
-                cursor: "pointer",
-                animation: `cardGlow 4s ease-in-out infinite ${i * 0.3}s`,
-              }}
-            >
-              <div>
-                <div className="card-icon" style={{
-                  fontSize: 30,
-                  marginBottom: 18,
-                  filter: "drop-shadow(0 0 10px rgba(0,212,138,0.7))",
-                  transition: "filter 0.18s ease",
-                }}>
-                  {action.icon}
-                </div>
-                <h2 style={{
-                  margin: "0 0 8px 0",
-                  fontSize: 18,
-                  fontWeight: 800,
-                  letterSpacing: "-0.01em",
-                  textShadow: "0 0 20px rgba(0,212,138,0.4)",
-                }}>
-                  {action.label}
-                </h2>
-                <p style={{
-                  margin: 0,
-                  fontSize: 13,
-                  opacity: 0.45,
-                  fontWeight: 500,
-                  lineHeight: 1.5,
-                }}>
-                  {action.description}
-                </p>
-              </div>
-
-              <div style={{
-                marginTop: 24,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                opacity: 0.55,
+          <Link
+            href={action.href}
+            className="action-card"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              flex: 1,
+              padding: "28px 24px 22px",
+              borderRadius: 20,
+              border: "1px solid rgba(0,212,138,0.2)",
+              background: "linear-gradient(160deg, #080f0c 0%, #040806 60%, #020504 100%)",
+              textDecoration: "none",
+              color: jade,
+              cursor: "pointer",
+              animation: `cardGlow 4s ease-in-out infinite ${i * 0.3}s`,
+            }}
+          >
+            <div>
+              <div className="card-icon" style={{
+                fontSize: 30,
+                marginBottom: 18,
+                filter: "drop-shadow(0 0 10px rgba(0,212,138,0.7))",
+                transition: "filter 0.18s ease",
               }}>
-                {action.authRequired ? "Sign in" : "Go"}
-                <span
-                  className="card-arrow"
-                  style={{
-                    opacity: 0,
-                    transform: "translateX(0)",
-                    transition: "opacity 0.18s ease, transform 0.18s ease",
-                    fontSize: 14,
-                  }}
-                >
-                  →
-                </span>
+                {action.icon}
               </div>
-            </Link>
+              <h2 style={{
+                margin: "0 0 8px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                letterSpacing: "-0.01em",
+                textShadow: "0 0 20px rgba(0,212,138,0.4)",
+              }}>
+                {action.label}
+              </h2>
+              <p style={{
+                margin: 0,
+                fontSize: 13,
+                opacity: 0.45,
+                fontWeight: 500,
+                lineHeight: 1.5,
+              }}>
+                {action.description}
+              </p>
+            </div>
+
+            <div style={{
+              marginTop: 24,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              opacity: 0.55,
+            }}>
+              Go
+              <span
+                className="card-arrow"
+                style={{
+                  opacity: 0,
+                  transform: "translateX(0)",
+                  transition: "opacity 0.18s ease, transform 0.18s ease",
+                  fontSize: 14,
+                }}
+              >
+                →
+              </span>
+            </div>
+          </Link>
           </div>
         ))}
       </div>

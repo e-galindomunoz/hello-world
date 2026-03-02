@@ -18,7 +18,7 @@ export default async function CaptionsPage() {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
 
-  if (!user) redirect("/");
+  if (!user) redirect("/sign-in");
 
   const initialCaptions = await getRandomCaptions(10);
 
