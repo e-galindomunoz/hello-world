@@ -5,10 +5,13 @@ import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 export const metadata: Metadata = { title: "Sign In" };
 
-export default async function SignInPage() {
+export default async function SignInPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getUser();
   if (data.user) redirect("/home");
+
+  const { error } = await searchParams;
+  const isUnauthorized = error === "unauthorized_domain";
 
   return (
     <main
@@ -128,6 +131,20 @@ export default async function SignInPage() {
           marginBottom: 32,
           animation: "fadeUp 0.6s ease 0.25s both",
         }} />
+
+        {/* Unauthorized domain error */}
+        {isUnauthorized && (
+          <p style={{
+            margin: "0 0 20px 0",
+            fontSize: 13,
+            color: "#ff6b6b",
+            textShadow: "0 0 10px rgba(255,107,107,0.4)",
+            fontWeight: 600,
+            animation: "fadeUp 0.4s ease both",
+          }}>
+            Your email domain isn&apos;t authorized. Please use a school email.
+          </p>
+        )}
 
         {/* Button */}
         <div style={{ animation: "fadeUp 0.6s ease 0.3s both" }}>
