@@ -100,9 +100,9 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
           style={{
             width: "100%",
             borderRadius: "12px",
-            marginBottom: "20px",
+            marginBottom: "16px",
             display: "block",
-            aspectRatio: "1/1",
+            maxHeight: "38vh",
             objectFit: "cover",
             boxShadow: `
               0 0 0 1px rgba(0, 212, 138, 0.18),
@@ -115,7 +115,7 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
 
       <p
         style={{
-          margin: "0 0 20px 0",
+          margin: "0 0 14px 0",
           fontSize: "21px",
           fontWeight: 600,
           textAlign: "center",

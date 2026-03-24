@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 const jade = "#00D48A";
 
@@ -12,24 +13,29 @@ const navLinks = [
   { href: "/generate", label: "Generate", icon: "✦" },
 ];
 
-export default function HamburgerMenu() {
+export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleClick(e: PointerEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    if (open) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    if (open) document.addEventListener("pointerdown", handleClick);
+    return () => document.removeEventListener("pointerdown", handleClick);
   }, [open]);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <>
@@ -56,6 +62,13 @@ export default function HamburgerMenu() {
         .nav-link-item:hover {
           background: rgba(0,212,138,0.1) !important;
           box-shadow: inset 0 0 0 1px rgba(0,212,138,0.25) !important;
+        }
+        .signout-btn {
+          transition: background 0.15s ease, box-shadow 0.15s ease;
+        }
+        .signout-btn:hover {
+          background: rgba(255,80,80,0.08) !important;
+          box-shadow: inset 0 0 0 1px rgba(255,80,80,0.2) !important;
         }
       `}</style>
 
@@ -136,6 +149,29 @@ export default function HamburgerMenu() {
               `,
             }}
           >
+            {userEmail && (
+              <>
+                <div style={{ padding: "10px 14px 8px" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: jade, opacity: 0.35 }}>
+                    Signed in as
+                  </div>
+                  <div style={{
+                    fontSize: 12,
+                    color: jade,
+                    opacity: 0.55,
+                    letterSpacing: "0.01em",
+                    marginTop: 2,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {userEmail}
+                  </div>
+                </div>
+                <div style={{ margin: "0 8px 6px", height: 1, background: "rgba(0,212,138,0.1)" }} />
+              </>
+            )}
+
             {navLinks.map(link => {
               const active = pathname === link.href;
               return (
@@ -187,6 +223,39 @@ export default function HamburgerMenu() {
                 </Link>
               );
             })}
+
+            {userEmail && (
+              <>
+                <div style={{
+                  margin: "6px 8px",
+                  height: 1,
+                  background: "rgba(0,212,138,0.1)",
+                }} />
+                <button
+                  className="signout-btn"
+                  onClick={handleSignOut}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 14px",
+                    borderRadius: 9,
+                    width: "100%",
+                    border: "none",
+                    background: "transparent",
+                    color: "rgba(255,100,100,0.75)",
+                    fontSize: 14,
+                    fontWeight: 500,
+                    letterSpacing: "0.01em",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>→</span>
+                  Log out
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

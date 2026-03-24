@@ -52,7 +52,7 @@ export default async function HomePage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px 20px",
+        padding: "80px 20px 40px",
         position: "relative",
         overflow: "hidden",
       }}
