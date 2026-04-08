@@ -48,28 +48,6 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         }
       `}</style>
 
-      {/* Ambient background orbs */}
-      <div style={{
-        position: "absolute", top: "-10%", left: "20%",
-        width: 600, height: 600, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,212,138,0.12) 0%, transparent 65%)",
-        animation: "orb1 8s ease-in-out infinite",
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "-10%", right: "15%",
-        width: 500, height: 500, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,212,138,0.08) 0%, transparent 65%)",
-        animation: "orb2 10s ease-in-out infinite",
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", top: "40%", left: "-5%",
-        width: 300, height: 300, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,212,138,0.05) 0%, transparent 65%)",
-        animation: "orb2 12s ease-in-out infinite 2s",
-        pointerEvents: "none",
-      }} />
 
       {/* Card */}
       <div

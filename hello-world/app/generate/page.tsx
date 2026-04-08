@@ -21,10 +21,10 @@ export default async function GeneratePage() {
         style={{
           minHeight: "100vh",
           background:
-            "radial-gradient(ellipse 120% 40% at 50% -5%, rgba(0, 212, 138, 0.07) 0%, #000 65%)",
+            "#000",
           display: "flex",
           justifyContent: "center",
-          padding: "60px 16px",
+          padding: "84px 16px",
           color: jade,
         }}
       >

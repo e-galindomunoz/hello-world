@@ -42,44 +42,14 @@ export default async function GalleryPage() {
         style={{
           minHeight: "100vh",
           background:
-            "radial-gradient(ellipse 120% 40% at 50% -5%, rgba(0,212,138,0.07) 0%, #000 65%)",
+            "#000",
           color: jade,
-          paddingTop: 60,
+          paddingTop: 84,
           paddingBottom: 80,
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Ambient background orbs */}
-        <div
-          className="ambient-orb"
-          style={{
-            position: "absolute",
-            top: -120,
-            left: "10%",
-            width: 500,
-            height: 500,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(0,212,138,0.12) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          className="ambient-orb"
-          style={{
-            position: "absolute",
-            bottom: 0,
-            right: "5%",
-            width: 400,
-            height: 400,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(0,212,138,0.07) 0%, transparent 70%)",
-            pointerEvents: "none",
-            animationDelay: "3s",
-          }}
-        />
 
         <div
           style={{

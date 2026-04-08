@@ -217,7 +217,7 @@ export default function UploadCaptioner() {
       const captionsRes = await fetch(`${API_BASE}/pipeline/generate-captions`, {
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ imageId }),
+        body: JSON.stringify({ imageId, humorFlavorId: 360 }),
       });
       if (!captionsRes.ok) throw new Error(await readErrorMessage(captionsRes, "Caption generation failed."));
 

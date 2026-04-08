@@ -27,11 +27,11 @@ export default async function CaptionsPage() {
       style={{
         height: "100vh",
         overflow: "hidden",
-        background:
-          "radial-gradient(ellipse 120% 40% at 50% -5%, rgba(0, 212, 138, 0.07) 0%, #000 65%)",
+        background: "#000",
         display: "flex",
-        justifyContent: "center",
-        padding: "56px 16px 16px",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "80px 16px 16px",
         color: jade,
       }}
     >
@@ -50,6 +50,11 @@ export default async function CaptionsPage() {
             0 40px 80px rgba(0, 0, 0, 0.95),
             inset 0 1px 0 rgba(0, 212, 138, 0.1)
           `,
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <h1

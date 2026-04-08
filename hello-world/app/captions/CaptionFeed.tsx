@@ -91,6 +91,11 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
           inset 0 -1px 0 rgba(0, 0, 0, 0.4)
         `,
         transition: "all 0.3s ease",
+        flex: 1,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
       {currentCaption.images?.url && (
@@ -99,11 +104,12 @@ export default function CaptionFeed({ initialCaptions, jade, user }: CaptionFeed
           alt="Caption Image"
           style={{
             width: "100%",
+            flex: 1,
+            minHeight: 0,
+            objectFit: "contain",
             borderRadius: "12px",
             marginBottom: "16px",
             display: "block",
-            maxHeight: "38vh",
-            objectFit: "cover",
             boxShadow: `
               0 0 0 1px rgba(0, 212, 138, 0.18),
               0 8px 32px rgba(0, 0, 0, 0.8),

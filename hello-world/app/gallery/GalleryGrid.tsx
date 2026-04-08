@@ -18,15 +18,6 @@ interface GalleryGridProps {
   initialTotalCount: number;
 }
 
-function formatDate(iso: string | null) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 function getPaginationRange(current: number, total: number): (number | "...")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
@@ -45,6 +36,10 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   useEffect(() => {
+    setCaptions(prev => [...prev].sort(() => Math.random() - 0.5));
+  }, []);
+
+  useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -53,7 +48,7 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
     setIsLoading(true);
     getGalleryCaptions(sort, page).then(result => {
       if (cancelled) return;
-      setCaptions(result.captions as GalleryCaption[]);
+      setCaptions([...(result.captions as GalleryCaption[])].sort(() => Math.random() - 0.5));
       setTotalCount(result.totalCount);
       setIsLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -77,30 +72,59 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
   return (
     <>
       <style>{`
-        @keyframes cardFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-3px); }
+        .mosaic-tile {
+          break-inside: avoid;
+          position: relative;
+          border-radius: 14px;
+          overflow: hidden;
+          margin-bottom: 16px;
+          border: 1px solid rgba(0,212,138,0.15);
+          cursor: default;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(0,212,138,0.07);
         }
-        .gallery-card {
-          transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        .mosaic-tile:hover {
+          border-color: rgba(0,212,138,0.5);
+          box-shadow: 0 0 0 1px rgba(0,212,138,0.2), 0 12px 48px rgba(0,212,138,0.18), 0 30px 80px rgba(0,0,0,0.95);
+          transform: translateY(-4px);
         }
-        .gallery-card:hover {
-          transform: translateY(-6px) !important;
-          box-shadow:
-            0 0 0 1px rgba(0,212,138,0.25),
-            0 12px 48px rgba(0,212,138,0.18),
-            0 30px 80px rgba(0,0,0,0.95),
-            inset 0 1px 0 rgba(0,212,138,0.2) !important;
-          border-color: rgba(0,212,138,0.45) !important;
+        .mosaic-tile img {
+          display: block;
+          width: 100%;
+          height: auto;
+          transition: transform 0.4s ease;
         }
-        .gallery-card img {
-          transition: transform 0.35s ease;
+        .mosaic-tile:hover img {
+          transform: scale(1.04);
         }
-        .gallery-card:hover img {
-          transform: scale(1.03);
+        .mosaic-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          display: flex;
+          align-items: flex-end;
+          padding: 18px;
+        }
+        .mosaic-tile:hover .mosaic-overlay {
+          opacity: 1;
+        }
+        .mosaic-caption {
+          color: ${jade};
+          font-size: 13px;
+          font-weight: 600;
+          line-height: 1.5;
+          letter-spacing: 0.01em;
+          text-shadow: 0 0 20px rgba(0,212,138,0.6);
+          transform: translateY(8px);
+          transition: transform 0.3s ease;
+        }
+        .mosaic-tile:hover .mosaic-caption {
+          transform: translateY(0);
         }
         .sort-btn {
-          transition: background 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+          transition: background 0.15s ease, box-shadow 0.15s ease;
         }
         .sort-btn:hover {
           box-shadow: 0 0 16px rgba(0,212,138,0.3) !important;
@@ -111,6 +135,12 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
         .page-btn:hover:not(:disabled) {
           background: rgba(0,212,138,0.1) !important;
           box-shadow: 0 0 12px rgba(0,212,138,0.25) !important;
+        }
+        @media (max-width: 700px) {
+          .mosaic-columns { columns: 2 !important; }
+        }
+        @media (max-width: 420px) {
+          .mosaic-columns { columns: 1 !important; }
         }
       `}</style>
 
@@ -147,7 +177,7 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
         </span>
       </div>
 
-      {/* Grid */}
+      {/* Mosaic */}
       {isLoading ? (
         <div style={{ textAlign: "center", padding: "80px 0", color: jade, opacity: 0.4, fontSize: 15, letterSpacing: "0.06em", textTransform: "uppercase" }}>
           Loading...
@@ -157,42 +187,12 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
           No captions yet
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+        <div className="mosaic-columns" style={{ columns: 3, columnGap: 16 }}>
           {captions.map(cap => (
-            <div
-              key={cap.id}
-              className="gallery-card"
-              style={{
-                background: "linear-gradient(160deg, #081410 0%, #040a08 60%, #020504 100%)",
-                border: "1px solid rgba(0,212,138,0.2)",
-                borderRadius: 16,
-                overflow: "hidden",
-                boxShadow: `
-                  0 0 0 1px rgba(0,212,138,0.04),
-                  0 4px 24px rgba(0,212,138,0.07),
-                  0 16px 48px rgba(0,0,0,0.9),
-                  inset 0 1px 0 rgba(0,212,138,0.09)
-                `,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div style={{ overflow: "hidden", borderBottom: "1px solid rgba(0,212,138,0.1)", flexShrink: 0 }}>
-                <img
-                  src={cap.images!.url}
-                  alt=""
-                  style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }}
-                />
-              </div>
-              <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: jade, lineHeight: 1.5, textShadow: "0 0 16px rgba(0,212,138,0.35)", letterSpacing: "0.01em", flex: 1 }}>
-                  &ldquo;{cap.content}&rdquo;
-                </p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingTop: 10, borderTop: "1px solid rgba(0,212,138,0.08)" }}>
-                  <span style={{ fontSize: 11, color: jade, opacity: 0.3, letterSpacing: "0.07em", fontWeight: 500 }}>
-                    {formatDate(cap.created_datetime_utc)}
-                  </span>
-                </div>
+            <div key={cap.id} className="mosaic-tile">
+              <img src={cap.images!.url} alt="" />
+              <div className="mosaic-overlay">
+                <p className="mosaic-caption">&ldquo;{cap.content}&rdquo;</p>
               </div>
             </div>
           ))}
@@ -202,34 +202,23 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
       {/* Pagination */}
       {totalPages > 1 && (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 48 }}>
-          {/* Prev */}
           <button
             className="page-btn"
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1 || isLoading}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 8,
+              width: 36, height: 36, borderRadius: 8,
               border: `1px solid rgba(0,212,138,${page === 1 ? "0.1" : "0.25"})`,
-              background: "transparent",
-              color: jade,
-              fontSize: 16,
+              background: "transparent", color: jade, fontSize: 16,
               cursor: page === 1 ? "default" : "pointer",
               opacity: page === 1 ? 0.3 : 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}
-          >
-            ‹
-          </button>
+          >‹</button>
 
           {paginationRange.map((item, i) =>
             item === "..." ? (
-              <span key={`ellipsis-${i}`} style={{ color: jade, opacity: 0.3, fontSize: 13, padding: "0 4px" }}>
-                ...
-              </span>
+              <span key={`ellipsis-${i}`} style={{ color: jade, opacity: 0.3, fontSize: 13, padding: "0 4px" }}>...</span>
             ) : (
               <button
                 key={item}
@@ -237,49 +226,32 @@ export default function GalleryGrid({ initialCaptions, initialTotalCount }: Gall
                 onClick={() => handlePageChange(item as number)}
                 disabled={isLoading}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 8,
+                  width: 36, height: 36, borderRadius: 8,
                   border: `1px solid rgba(0,212,138,${page === item ? "0.5" : "0.2"})`,
                   background: page === item ? "linear-gradient(145deg, #0d1f17 0%, #081410 100%)" : "transparent",
-                  color: jade,
-                  fontSize: 13,
-                  fontWeight: page === item ? 700 : 400,
+                  color: jade, fontSize: 13, fontWeight: page === item ? 700 : 400,
                   cursor: "pointer",
                   boxShadow: page === item ? "0 0 14px rgba(0,212,138,0.2)" : "none",
                   textShadow: page === item ? "0 0 10px rgba(0,212,138,0.5)" : "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: "flex", alignItems: "center", justifyContent: "center",
                 }}
-              >
-                {item}
-              </button>
+              >{item}</button>
             )
           )}
 
-          {/* Next */}
           <button
             className="page-btn"
             onClick={() => handlePageChange(page + 1)}
             disabled={page === totalPages || isLoading}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 8,
+              width: 36, height: 36, borderRadius: 8,
               border: `1px solid rgba(0,212,138,${page === totalPages ? "0.1" : "0.25"})`,
-              background: "transparent",
-              color: jade,
-              fontSize: 16,
+              background: "transparent", color: jade, fontSize: 16,
               cursor: page === totalPages ? "default" : "pointer",
               opacity: page === totalPages ? 0.3 : 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}
-          >
-            ›
-          </button>
+          >›</button>
         </div>
       )}
     </>

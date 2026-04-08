@@ -1,12 +1,17 @@
-import { NextResponse } from "next/server";
-import { createSupabaseServerActionClient } from "@/lib/supabaseServer";
+import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseRouteHandlerClient } from "@/lib/supabaseServer";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
 
+  const response = NextResponse.redirect(`${origin}/home`);
+
   if (code) {
-    const supabase = await createSupabaseServerActionClient();
+    const supabase = createSupabaseRouteHandlerClient(request, (name, value, options) => {
+      response.cookies.set(name, value, options);
+    });
+
     await supabase.auth.exchangeCodeForSession(code);
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -25,5 +30,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/home`);
+  return response;
 }

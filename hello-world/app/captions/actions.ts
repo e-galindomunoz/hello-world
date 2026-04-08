@@ -1,6 +1,6 @@
 "use server";
 
-import { createSupabaseServerActionClient } from "@/lib/supabaseServer";
+import { createSupabaseServerClient, createSupabaseServerActionClient } from "@/lib/supabaseServer";
 
 export async function submitVote(captionId: string, voteValue: number) {
   try {
@@ -55,6 +55,7 @@ export async function getRandomCaptions(limit: number = 5) {
         .select("id, images!inner(id)")
         .not("content", "is", null)
         .neq("content", "")
+        .eq("humor_flavor_id", 360)
         .limit(200),
       userId
         ? supabase.from("caption_votes").select("caption_id").eq("profile_id", userId)
@@ -123,16 +124,25 @@ export async function getGalleryCaptions(
 ) {
   const start = Date.now();
   try {
-    const supabase = await createSupabaseServerActionClient();
+    const supabase = await createSupabaseServerClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
 
     const from = (page - 1) * GALLERY_PAGE_SIZE;
     const to = from + GALLERY_PAGE_SIZE - 1;
 
-    const { data: captions, count, error } = await supabase
+    let query = supabase
       .from("captions")
       .select("id, content, created_datetime_utc, images!inner(url)", { count: "exact" })
       .not("content", "is", null)
       .neq("content", "")
+      .eq("humor_flavor_id", 360);
+
+    if (user) {
+      query = query.eq("profile_id", user.id);
+    }
+
+    const { data: captions, count, error } = await query
       .order("created_datetime_utc", { ascending: sortOrder === "oldest" })
       .range(from, to);
 
