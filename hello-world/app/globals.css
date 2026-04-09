@@ -4,10 +4,17 @@
   --background: #000000;
   --foreground: #ededed;
   --jade: #00D48A;
+  --violet: #A855F7;
+  --amber: #F59E0B;
 }
 
 body {
   background: #000;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 10% 40%, rgba(168,85,247,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 88% 12%, rgba(0,212,138,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 65% at 65% 90%, rgba(245,158,11,0.06) 0%, transparent 55%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
@@ -34,8 +41,8 @@ body {
   transition: all 0.2s ease;
 }
 .btn-jade-solid:hover:not(:disabled) {
-  background: #05eea0 !important;
-  box-shadow: 0 0 28px rgba(0, 212, 138, 0.55), 0 6px 18px rgba(0, 0, 0, 0.5) !important;
+  background: linear-gradient(135deg, #05eea0 0%, #C084FC 100%) !important;
+  box-shadow: 0 0 24px rgba(0,212,138,0.4), 0 0 24px rgba(168,85,247,0.3), 0 6px 18px rgba(0,0,0,0.5) !important;
   transform: translateY(-1px);
 }
 .btn-jade-solid:active:not(:disabled) {

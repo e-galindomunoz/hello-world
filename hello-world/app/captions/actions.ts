@@ -1,6 +1,6 @@
 "use server";
 
-import { createSupabaseServerClient, createSupabaseServerActionClient } from "@/lib/supabaseServer";
+import { createSupabaseServerActionClient } from "@/lib/supabaseServer";
 
 export async function submitVote(captionId: string, voteValue: number) {
   try {
@@ -124,7 +124,7 @@ export async function getGalleryCaptions(
 ) {
   const start = Date.now();
   try {
-    const supabase = await createSupabaseServerClient();
+    const supabase = await createSupabaseServerActionClient();
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -149,7 +149,7 @@ export async function getGalleryCaptions(
     console.log(`[getGalleryCaptions] done: ${Date.now() - start}ms, rows: ${captions?.length ?? 0}, total: ${count}`);
 
     if (error || !captions) {
-      console.error("Error fetching gallery captions:", error);
+      console.error("Error fetching gallery captions:", error?.message ?? error?.code ?? JSON.stringify(error), error);
       return { captions: [], totalCount: 0 };
     }
 

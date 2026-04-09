@@ -36,19 +36,31 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Navbar backdrop */}
         <div style={{
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           height: 72,
-          background: "rgba(0,0,0,0.85)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
+          background: "rgba(0,0,0,0.88)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
           zIndex: 999,
-          borderBottom: "1px solid rgba(0,212,138,0.07)",
           pointerEvents: "none",
         }} />
+        {/* Gradient border line under nav */}
+        <div style={{
+          position: "fixed",
+          top: 71,
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,212,138,0.35) 30%, rgba(168,85,247,0.35) 70%, transparent 100%)",
+          zIndex: 999,
+          pointerEvents: "none",
+        }} />
+
         <Link
           id="site-logo"
           href="/home"
@@ -60,8 +72,10 @@ export default function RootLayout({
             fontSize: 22,
             fontWeight: 900,
             letterSpacing: "-0.02em",
-            color: "#00D48A",
-            textShadow: "0 0 18px rgba(0,212,138,0.7), 0 0 40px rgba(0,212,138,0.3)",
+            background: "linear-gradient(135deg, #00D48A 0%, #A855F7 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
             textDecoration: "none",
             userSelect: "none",
           }}

@@ -41,8 +41,7 @@ export default async function GalleryPage() {
       <main
         style={{
           minHeight: "100vh",
-          background:
-            "#000",
+          background: "transparent",
           color: jade,
           paddingTop: 84,
           paddingBottom: 80,
@@ -61,14 +60,15 @@ export default async function GalleryPage() {
         >
           {/* Header */}
           <div style={{
-            background: "#000",
-            border: "1px solid rgba(0,212,138,0.15)",
+            background: "linear-gradient(145deg, #120826 0%, #080412 50%, #020504 100%)",
+            border: "1px solid rgba(168,85,247,0.2)",
             borderRadius: 14,
             padding: "18px 24px",
             marginBottom: 40,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            boxShadow: "0 4px 24px rgba(168,85,247,0.1), 0 0 0 1px rgba(0,212,138,0.04)",
           }}>
             <div>
               <h1
@@ -77,9 +77,11 @@ export default async function GalleryPage() {
                   fontSize: "clamp(28px, 4vw, 40px)",
                   fontWeight: 800,
                   letterSpacing: "-0.02em",
-                  textShadow:
-                    "0 0 40px rgba(0,212,138,0.6), 0 0 80px rgba(0,212,138,0.2)",
                   lineHeight: 1.1,
+                  background: "linear-gradient(135deg, #00D48A 0%, #A855F7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
                 }}
               >
                 Gallery
@@ -88,7 +90,8 @@ export default async function GalleryPage() {
                 style={{
                   margin: "8px 0 0 0",
                   fontSize: 14,
-                  opacity: 0.4,
+                  color: "#A855F7",
+                  opacity: 0.45,
                   letterSpacing: "0.04em",
                 }}
               >
@@ -103,16 +106,16 @@ export default async function GalleryPage() {
                 style={{
                   padding: "8px 16px",
                   borderRadius: 10,
-                  border: "1px solid rgba(0,212,138,0.4)",
-                  background: "linear-gradient(145deg, #0d1f17 0%, #060e0a 100%)",
-                  color: jade,
+                  border: "1px solid rgba(168,85,247,0.4)",
+                  background: "linear-gradient(145deg, #130d22 0%, #080412 100%)",
+                  color: "#A855F7",
                   fontSize: 13,
                   fontWeight: 700,
                   letterSpacing: "0.04em",
                   textTransform: "uppercase",
                   textDecoration: "none",
-                  boxShadow: "0 0 14px rgba(0,212,138,0.2), inset 0 1px 0 rgba(0,212,138,0.08)",
-                  textShadow: "0 0 10px rgba(0,212,138,0.5)",
+                  boxShadow: "0 0 14px rgba(168,85,247,0.2), inset 0 1px 0 rgba(168,85,247,0.08)",
+                  textShadow: "0 0 10px rgba(168,85,247,0.5)",
                 }}
               >
                 Sign In

@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 const jade = "#00D48A";
+const violet = "#A855F7";
+const amber = "#F59E0B";
 
 const navLinks = [
-  { href: "/captions", label: "Rate Captions", icon: "⚡" },
-  { href: "/gallery", label: "Gallery", icon: "◈" },
-  { href: "/generate", label: "Generate", icon: "✦" },
+  { href: "/captions", label: "Rate Captions", icon: "⚡", color: jade,   colorRgb: "0,212,138" },
+  { href: "/gallery",  label: "Gallery",        icon: "◈", color: violet, colorRgb: "168,85,247" },
+  { href: "/generate", label: "Generate",       icon: "✦", color: amber,  colorRgb: "245,158,11" },
 ];
 
 export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
@@ -45,30 +47,26 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
           to   { opacity: 1; transform: translateY(0)   scale(1); }
         }
         @keyframes burgerGlow {
-          0%, 100% { box-shadow: 0 0 12px rgba(0,212,138,0.25), 0 4px 20px rgba(0,0,0,0.6); }
-          50%       { box-shadow: 0 0 22px rgba(0,212,138,0.45), 0 4px 20px rgba(0,0,0,0.6); }
+          0%, 100% { box-shadow: 0 0 12px rgba(0,212,138,0.2), 0 0 20px rgba(168,85,247,0.12), 0 4px 20px rgba(0,0,0,0.6); }
+          50%       { box-shadow: 0 0 22px rgba(0,212,138,0.38), 0 0 30px rgba(168,85,247,0.22), 0 4px 20px rgba(0,0,0,0.6); }
         }
         .burger-btn {
           animation: burgerGlow 3s ease-in-out infinite;
         }
         .burger-btn:hover {
-          background: linear-gradient(145deg, #0d1f17 0%, #0a1a11 100%) !important;
-          box-shadow: 0 0 28px rgba(0,212,138,0.5), 0 4px 20px rgba(0,0,0,0.7) !important;
+          background: linear-gradient(145deg, #130d22 0%, #0a1810 100%) !important;
+          box-shadow: 0 0 28px rgba(0,212,138,0.4), 0 0 28px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.7) !important;
           animation: none !important;
         }
         .nav-link-item {
-          transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-        }
-        .nav-link-item:hover {
-          background: rgba(0,212,138,0.1) !important;
-          box-shadow: inset 0 0 0 1px rgba(0,212,138,0.25) !important;
+          transition: background 0.15s ease, box-shadow 0.15s ease;
         }
         .signout-btn {
           transition: background 0.15s ease, box-shadow 0.15s ease;
         }
         .signout-btn:hover {
-          background: rgba(255,80,80,0.08) !important;
-          box-shadow: inset 0 0 0 1px rgba(255,80,80,0.2) !important;
+          background: rgba(244,63,94,0.1) !important;
+          box-shadow: inset 0 0 0 1px rgba(244,63,94,0.25) !important;
         }
       `}</style>
 
@@ -94,10 +92,10 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
             width: 44,
             height: 44,
             borderRadius: 12,
-            border: `1px solid rgba(0,212,138,${open ? "0.5" : "0.3"})`,
+            border: `1px solid rgba(168,85,247,${open ? "0.55" : "0.3"})`,
             background: open
-              ? "linear-gradient(145deg, #0d1f17 0%, #0a1a11 100%)"
-              : "linear-gradient(145deg, #081410 0%, #050e09 100%)",
+              ? "linear-gradient(145deg, #130d22 0%, #0a1810 100%)"
+              : "linear-gradient(145deg, #0a0514 0%, #050e09 100%)",
             cursor: "pointer",
             display: "flex",
             flexDirection: "column",
@@ -116,8 +114,12 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
                 width: 18,
                 height: 2,
                 borderRadius: 2,
-                background: jade,
-                boxShadow: `0 0 6px rgba(0,212,138,0.7)`,
+                background: i === 0 ? jade : i === 1 ? violet : amber,
+                boxShadow: i === 0
+                  ? "0 0 6px rgba(0,212,138,0.8)"
+                  : i === 1
+                  ? "0 0 6px rgba(168,85,247,0.8)"
+                  : "0 0 6px rgba(245,158,11,0.8)",
                 transition: "transform 0.2s ease, opacity 0.2s ease",
                 transform:
                   open && i === 0
@@ -136,29 +138,30 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
           <div
             style={{
               animation: "menuFadeIn 0.18s ease forwards",
-              background: "linear-gradient(160deg, #080f0c 0%, #040806 100%)",
-              border: "1px solid rgba(0,212,138,0.25)",
+              background: "linear-gradient(160deg, #0a0514 0%, #050408 50%, #040806 100%)",
+              border: "1px solid rgba(168,85,247,0.25)",
               borderRadius: 14,
               padding: "8px",
-              minWidth: 180,
+              minWidth: 190,
               boxShadow: `
-                0 0 0 1px rgba(0,212,138,0.06),
-                0 8px 32px rgba(0,212,138,0.1),
+                0 0 0 1px rgba(168,85,247,0.06),
+                0 8px 32px rgba(168,85,247,0.12),
+                0 8px 32px rgba(0,212,138,0.06),
                 0 20px 60px rgba(0,0,0,0.95),
-                inset 0 1px 0 rgba(0,212,138,0.1)
+                inset 0 1px 0 rgba(168,85,247,0.1)
               `,
             }}
           >
             {userEmail && (
               <>
                 <div style={{ padding: "10px 14px 8px" }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: jade, opacity: 0.35 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: violet, opacity: 0.45 }}>
                     Signed in as
                   </div>
                   <div style={{
                     fontSize: 12,
-                    color: jade,
-                    opacity: 0.55,
+                    color: violet,
+                    opacity: 0.6,
                     letterSpacing: "0.01em",
                     marginTop: 2,
                     overflow: "hidden",
@@ -168,7 +171,7 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
                     {userEmail}
                   </div>
                 </div>
-                <div style={{ margin: "0 8px 6px", height: 1, background: "rgba(0,212,138,0.1)" }} />
+                <div style={{ margin: "0 8px 6px", height: 1, background: "linear-gradient(90deg, rgba(0,212,138,0.15), rgba(168,85,247,0.15))" }} />
               </>
             )}
 
@@ -186,39 +189,43 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
                     padding: "10px 14px",
                     borderRadius: 9,
                     textDecoration: "none",
-                    color: jade,
+                    color: link.color,
                     fontSize: 14,
                     fontWeight: active ? 700 : 500,
                     letterSpacing: "0.01em",
-                    background: active ? "rgba(0,212,138,0.08)" : "transparent",
+                    background: active ? `rgba(${link.colorRgb},0.1)` : "transparent",
                     boxShadow: active
-                      ? "inset 0 0 0 1px rgba(0,212,138,0.2)"
+                      ? `inset 0 0 0 1px rgba(${link.colorRgb},0.25)`
                       : "none",
                     textShadow: active
-                      ? "0 0 14px rgba(0,212,138,0.5)"
+                      ? `0 0 14px rgba(${link.colorRgb},0.6)`
                       : "none",
                   }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = `rgba(${link.colorRgb},0.08)`;
+                    (e.currentTarget as HTMLElement).style.boxShadow = `inset 0 0 0 1px rgba(${link.colorRgb},0.2)`;
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = active ? `rgba(${link.colorRgb},0.1)` : "transparent";
+                    (e.currentTarget as HTMLElement).style.boxShadow = active ? `inset 0 0 0 1px rgba(${link.colorRgb},0.25)` : "none";
+                  }}
                 >
-                  <span
-                    style={{
-                      fontSize: 16,
-                      filter: "drop-shadow(0 0 4px rgba(0,212,138,0.6))",
-                    }}
-                  >
+                  <span style={{
+                    fontSize: 16,
+                    filter: `drop-shadow(0 0 4px rgba(${link.colorRgb},0.7))`,
+                  }}>
                     {link.icon}
                   </span>
                   {link.label}
                   {active && (
-                    <span
-                      style={{
-                        marginLeft: "auto",
-                        width: 5,
-                        height: 5,
-                        borderRadius: "50%",
-                        background: jade,
-                        boxShadow: "0 0 6px rgba(0,212,138,0.8)",
-                      }}
-                    />
+                    <span style={{
+                      marginLeft: "auto",
+                      width: 5,
+                      height: 5,
+                      borderRadius: "50%",
+                      background: link.color,
+                      boxShadow: `0 0 6px rgba(${link.colorRgb},0.9)`,
+                    }} />
                   )}
                 </Link>
               );
@@ -229,7 +236,7 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
                 <div style={{
                   margin: "6px 8px",
                   height: 1,
-                  background: "rgba(0,212,138,0.1)",
+                  background: "linear-gradient(90deg, rgba(0,212,138,0.1), rgba(245,158,11,0.1))",
                 }} />
                 <button
                   className="signout-btn"
@@ -243,7 +250,7 @@ export default function HamburgerMenu({ userEmail }: { userEmail?: string }) {
                     width: "100%",
                     border: "none",
                     background: "transparent",
-                    color: "rgba(255,100,100,0.75)",
+                    color: "rgba(244,63,94,0.8)",
                     fontSize: 14,
                     fontWeight: 500,
                     letterSpacing: "0.01em",
